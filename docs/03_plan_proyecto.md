@@ -275,11 +275,11 @@ Esquema:
 
 **Objetivo:** Generar GIFs de curvas de nivel para u_x, u_y y presion.
 **Depende de:** Fase 4
-**Estado:** [ ] Pendiente
+**Estado:** [x] Completada
 
 **Pasos:**
 
-21. [ ] **Crear `src/evaluation/generar_gifs.py`** — Generacion de GIFs:
+21. [x] **Crear `src/evaluation/generar_gifs.py`** — Generacion de GIFs:
     - Cargar modelo entrenado desde checkpoint
     - Predecir sobre toda la malla (modelo en eval, torch.no_grad)
     - Para cada variable (u_x, u_y, p):
@@ -290,11 +290,11 @@ Esquema:
     - Guardar en directorio `reports/`
     - Referencia: `trabajo_base_pinns/cuadernos/elaboracion_gifs.ipynb` funcion generar_gif
 
-22. [ ] **Crear `src/evaluation/metricas.py`** — Metricas de evaluacion:
+22. [x] **Crear `src/evaluation/metricas.py`** — Metricas de evaluacion:
     - MSE por variable (u, v, p) en puntos de estaciones
     - Residual Navier-Stokes promedio
 
-23. [ ] **Commit:** `feat: evaluacion — GIFs de curvas de nivel y metricas`
+23. [x] **Commit:** `feat: evaluacion — GIFs de curvas de nivel y metricas`
 
 **Archivos a crear:**
 - `src/evaluation/generar_gifs.py`
