@@ -226,17 +226,17 @@ Esquema:
 
 **Objetivo:** Implementar el entrenamiento completo con logging, checkpoints y CUDA.
 **Depende de:** Fases 2 y 3
-**Estado:** [ ] Pendiente
+**Estado:** [x] Completada
 
 **Pasos:**
 
-17. [ ] **Crear `config/logging_config.py`** — Log dual:
+17. [x] **Crear `config/logging_config.py`** — Log dual:
     - Consola: nivel INFO
     - Archivo en `logs/`: nivel DEBUG con timestamp
     - Registrar en puntos clave: inicio, cada N epocas, cambio de LR, checkpoint, fin
     - Referencia: `trabajo_base_pinns/config/logging_config.py`
 
-18. [ ] **Crear `src/training/entrenador.py`** — Bucle de entrenamiento:
+18. [x] **Crear `src/training/entrenador.py`** — Bucle de entrenamiento:
     - Deteccion automatica CUDA para seleccionar device
     - Modelo a GPU
     - DataLoaders para estaciones y puntos de colocacion
@@ -255,14 +255,14 @@ Esquema:
       - epoch, loss, ns_loss, p_loss, u_loss, v_loss, lr
     - Referencia: `trabajo_base_pinns/src/train_pinn.py`
 
-19. [ ] **Crear `main.py`** — Punto de entrada:
+19. [x] **Crear `main.py`** — Punto de entrada:
     - Cargar datos -> Preprocesar -> Normalizar -> Construir malla
     - Crear datasets y dataloaders
     - Instanciar modelo PINN en GPU
     - Ejecutar entrenamiento
     - Referencia: `trabajo_base_pinns/main.py`
 
-20. [ ] **Commit:** `feat: bucle de entrenamiento con CUDA, logging y checkpoints`
+20. [x] **Commit:** `feat: bucle de entrenamiento con CUDA, logging y checkpoints`
 
 **Archivos a crear/modificar:**
 - `src/training/entrenador.py`
