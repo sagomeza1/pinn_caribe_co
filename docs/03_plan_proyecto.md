@@ -377,3 +377,11 @@ Esquema:
 | Fecha | Cambio | Estado |
 |-------|--------|--------|
 | 2026-04-09 | Plan inicial creado y aprobado | Completado |
+| 2026-04-09 | Fase 1: estructura, git, venv, config, logging | Completado |
+| 2026-04-09 | Fase 2: pipeline datos (carga, preproceso, normalizacion, malla, datasets) | Completado |
+| 2026-04-09 | Fase 3: arquitectura PINN (GammaBiasLayer, red 12x1200, perdida NS) | Completado |
+| 2026-04-09 | Fase 4: entrenamiento (Adam, ReduceLROnPlateau, checkpoints, main.py) | Completado |
+| 2026-04-09 | Fase 5: evaluacion (GIFs contourf + scatter, metricas MSE + residual NS) | Completado |
+| 2026-04-09 | PyTorch 2.6.0+cu124 instalado (driver NVIDIA 535 no compatible con cu130) | Nota |
+| 2026-04-09 | Verificacion: 22 est, 744 timesteps, 320 pts malla, 238K colocacion, 15.9M params | Nota |
+| 2026-04-09 | Test 2 epocas OK en CUDA: loss 2.80e+00 -> 2.60e+00 | Nota |
