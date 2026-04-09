@@ -184,11 +184,11 @@ Esquema:
 
 **Objetivo:** Implementar la red con Weight Normalization desacoplada segun especificacion.
 **Depende de:** Fase 1
-**Estado:** [ ] Pendiente
+**Estado:** [x] Completada
 
 **Pasos:**
 
-13. [ ] **Crear `src/model/capas.py`** — Capa personalizada GammaBiasLayer:
+13. [x] **Crear `src/model/capas.py`** — Capa personalizada GammaBiasLayer:
     - nn.Linear(in_features, out_features, bias=False)
     - weight_norm() de torch.nn.utils
     - gamma = nn.Parameter(torch.ones(out_features)) — escalado
@@ -196,7 +196,7 @@ Esquema:
     - Inicializacion Xavier/Glorot Uniform en pesos
     - Forward: y = gamma * (W_norm * x) + beta
 
-14. [ ] **Crear `src/model/pinn.py`** — Red PINN completa:
+14. [x] **Crear `src/model/pinn.py`** — Red PINN completa:
     - Input: (t, x, y) con dim=3
     - Capa de entrada: GammaBiasLayer(3, 1200) + Tanh
     - 8 capas ocultas con Tanh: GammaBiasLayer(1200, 1200) + Tanh
@@ -205,7 +205,7 @@ Esquema:
     - Output: (u_x, u_y, p)
     - **Total:** 1 entrada + 8 tanh + 4 lineal + 1 salida = 14 capas (12 ocultas)
 
-15. [ ] **Crear `src/model/perdida_fisica.py`** — Navier-Stokes inviscido:
+15. [x] **Crear `src/model/perdida_fisica.py`** — Navier-Stokes inviscido:
     - Derivadas parciales via torch.autograd.grad con create_graph=True
     - Ecuacion de continuidad: du/dx + dv/dy = 0
     - Momento X: du/dt + u*du/dx + v*du/dy + dp/dx = 0
@@ -213,7 +213,7 @@ Esquema:
     - Residual = MSE(e1, 0) + MSE(e2, 0) + MSE(e3, 0)
     - Referencia: `trabajo_base_pinns/src/loss_functions.py`
 
-16. [ ] **Commit:** `feat: arquitectura PINN con Weight Normalization y perdida Navier-Stokes`
+16. [x] **Commit:** `feat: arquitectura PINN con Weight Normalization y perdida Navier-Stokes`
 
 **Archivos a crear:**
 - `src/model/capas.py`
