@@ -117,16 +117,16 @@ Esquema:
 
 **Objetivo:** Cargar, preprocesar, normalizar y construir la malla, replicando el pipeline del proyecto base.
 **Depende de:** Fase 1
-**Estado:** [ ] Pendiente
+**Estado:** [x] Completada
 
 **Pasos:**
 
-7. [ ] **Crear `src/data/cargar_datos.py`** — Carga del Parquet con pyarrow
+7. [x] **Crear `src/data/cargar_datos.py`** — Carga del Parquet con pyarrow
    - Funcion `cargar_parquet(ruta)` que retorne arrays NumPy
    - Manejar valores faltantes segun regla canonica (no eliminar automaticamente, documentar)
    - Referencia: `trabajo_base_pinns/src/process_data.py` clase ProcessDataColombia
 
-8. [ ] **Crear `src/data/preprocesar_datos.py`** — Transformaciones del proyecto base:
+8. [x] **Crear `src/data/preprocesar_datos.py`** — Transformaciones del proyecto base:
    - **Proyeccion geografica a cartesiano:**
      - X_WS = 6378000 * sin(rad(longitud))
      - Y_WS = 6378000 * sin(rad(latitud))
@@ -136,7 +136,7 @@ Esquema:
    - **Filtrado temporal y ordenamiento por coordenada X**
    - Referencia: `trabajo_base_pinns/src/process_data.py` metodos `_process_coordinates_and_projections()`, `_filter_by_time_and_sort_by_coor()`
 
-9. [ ] **Crear `src/data/normalizar_datos.py`** — Adimensionalizacion:
+9. [x] **Crear `src/data/normalizar_datos.py`** — Adimensionalizacion:
    - **Centrado espacial:**
      - X_c = X - (X_min + X_max) / 2
      - Y_c = Y - (Y_min + Y_max) / 2
@@ -155,7 +155,7 @@ Esquema:
    - **Calcular Reynolds:** Re = W * L / nu
    - Referencia: `trabajo_base_pinns/src/process_data.py` metodo `_centered_grid_adimensionalization()`
 
-10. [ ] **Crear `src/data/construir_malla.py`** — Malla de prediccion:
+10. [x] **Crear `src/data/construir_malla.py`** — Malla de prediccion:
     - R_PINN = 6378000 * sin(rad(R)) con R=0.1
     - x_grid = arange(x_min - R_PINN, x_max + R_PINN, R_PINN) - centro_x
     - y_grid = arange(y_min - R_PINN, y_max + R_PINN, R_PINN) - centro_y
@@ -164,12 +164,12 @@ Esquema:
     - Normalizar la malla con las mismas escalas (L, W)
     - Referencia: `trabajo_base_pinns/src/process_data.py` metodo `_centered_grid_adimensionalization()` seccion de meshgrid
 
-11. [ ] **Crear `src/data/datasets.py`** — Datasets de PyTorch:
+11. [x] **Crear `src/data/datasets.py`** — Datasets de PyTorch:
     - `EstacionesDataset`: (t, x, y, u, v, p) aplanado a N_estaciones x N_tiempos filas
     - `ColocationDataset`: (t, x, y) puntos de la malla para perdida fisica
     - Referencia: `trabajo_base_pinns/src/dataset.py`
 
-12. [ ] **Commit:** `feat: pipeline de datos — carga, preprocesamiento, normalizacion y malla`
+12. [x] **Commit:** `feat: pipeline de datos — carga, preprocesamiento, normalizacion y malla`
 
 **Archivos a crear:**
 - `src/data/cargar_datos.py`
