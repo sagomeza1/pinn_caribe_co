@@ -1,7 +1,7 @@
 # Plan de Proyecto — PINN Prediccion Meteorologica Caribe Colombia
 
-**Ultima actualizacion:** 9 de abril de 2026
-**Estado global:** Fase 0 (Planificacion) — aprobado
+**Ultima actualizacion:** 10 de abril de 2026
+**Estado global:** Fase 6 (Ejecucion) — iteracion 1 completada, pendiente iteracion 2
 
 ---
 
@@ -306,26 +306,22 @@ Esquema:
 
 **Objetivo:** Entrenar, evaluar y ajustar iterativamente hasta que la red aprenda.
 **Depende de:** Fase 5
-**Estado:** [ ] Pendiente
+**Estado:** Iteracion 1 completada — pendiente iteracion 2
 
 **Pasos:**
 
-24. [ ] **Ejecutar entrenamiento inicial** (2000 epocas)
-    - Monitorear logs: verificar que loss total, loss_ns, loss_u, loss_v, loss_p disminuyen
-    - Verificar curva de aprendizaje
-25. [ ] **Generar GIFs** con el mejor checkpoint
-    - Evaluar visualmente si las predicciones tienen sentido fisico
-26. [ ] **Si el entrenamiento se estanca** (las perdidas no bajan), explorar:
-    - Ajustar lambda (peso de la perdida fisica)
-    - Modificar learning rate o scheduler
-    - Aumentar/reducir epocas
-    - Ajustar tamano de batch
-    - Learning rate warmup
-    - Cambiar inicializacion de pesos
-    - Normalizacion alternativa de datos
-    - Curriculum learning (entrenar primero solo datos, luego agregar fisica)
-    - Aumentar/reducir la complejidad de la red
-27. [ ] **Registrar cada iteracion** en `solutions/INFORME_entrenamiento.md`
+24. [x] **Ejecutar entrenamiento inicial** (2000 epocas)
+    - Loss total converge de 2.813 a 1.001 (reduccion 64.4%)
+    - Presion es cuello de botella (42.2% de la loss)
+25. [x] **Generar GIFs** con el mejor checkpoint
+    - GIFs generados para u_x, u_y, presion (744 frames cada uno)
+    - Bug corregido en generar_gifs.py: reshape (n_x,n_y) → (n_y,n_x)
+    - Resultado: modelo colapso a solucion cuasi-estacionaria
+26. [ ] **Si el entrenamiento se estanca** — REQUIERE ITERACION 2:
+    - Diagnostico: solucion cuasi-estacionaria, sin variacion temporal
+    - Estrategias priorizadas: curriculum learning, reescalado de presion
+    - Ver detalle en `solutions/INFORME_entrenamiento.md` seccion 6
+27. [x] **Registrar cada iteracion** en `solutions/INFORME_entrenamiento.md`
 28. [ ] **Commit por cada iteracion significativa**
 
 ---

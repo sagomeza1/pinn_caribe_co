@@ -84,8 +84,9 @@ def generar_gif(
         pred_var = torch.cat(predicciones, dim=0).numpy().flatten()
 
     # Coordenadas X, Y de la malla para el contourf (normalizadas)
-    x_mesh = malla["X"][:, 0].reshape((n_x, n_y), order="F")
-    y_mesh = malla["Y"][:, 0].reshape((n_x, n_y), order="F")
+    # meshgrid produce shape (n_y, n_x), flatten('F') requiere reshape a (n_y, n_x)
+    x_mesh = malla["X"][:, 0].reshape((n_y, n_x), order="F")
+    y_mesh = malla["Y"][:, 0].reshape((n_y, n_x), order="F")
 
     # Rango de la prediccion para colores consistentes
     val_min = np.nanmin(pred_var)
@@ -118,7 +119,7 @@ def generar_gif(
         # Prediccion PINN para este timestep
         inicio = t_idx * dim_N
         fin = (t_idx + 1) * dim_N
-        valores = pred_var[inicio:fin].reshape((n_x, n_y), order="F")
+        valores = pred_var[inicio:fin].reshape((n_y, n_x), order="F")
 
         # Contourf
         cs = ax.contourf(x_mesh, y_mesh, valores, **kwargs_contour)
