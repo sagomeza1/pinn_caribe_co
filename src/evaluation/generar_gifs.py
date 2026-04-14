@@ -155,6 +155,7 @@ def generar_todos_los_gifs(
     escalas: dict,
     device: torch.device,
     prefijo: str = "pinn",
+    fps: int = 60,
 ) -> None:
     """
     Genera GIFs para las tres variables de salida: u_x, u_y y presion.
@@ -165,6 +166,7 @@ def generar_todos_los_gifs(
     :param escalas: diccionario con escalas de referencia.
     :param device: dispositivo.
     :param prefijo: prefijo del nombre de archivos.
+    :param fps: frames por segundo del GIF.
     """
     for var in ["u", "v", "p"]:
         generar_gif(
@@ -175,4 +177,5 @@ def generar_todos_los_gifs(
             variable=var,
             nombre_archivo=f"{prefijo}_{var}",
             device=device,
+            fps=fps,
         )

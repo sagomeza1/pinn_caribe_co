@@ -26,11 +26,12 @@ from src.evaluation.generar_gifs import generar_todos_los_gifs
 from src.evaluation.metricas import evaluar_metricas
 
 
-def main(epoca: int = 2000):
+def main(epoca: int = 2000, fps: int = 60):
     """
     Evalua el modelo PINN cargando un checkpoint especifico.
 
     :param epoca: epoca del checkpoint a cargar.
+    :param fps: frames por segundo para los GIFs.
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     logger.info(f"Dispositivo: {device}")
@@ -82,6 +83,7 @@ def main(epoca: int = 2000):
         escalas=escalas,
         device=device,
         prefijo=f"pinn_epoca_{epoca}",
+        fps=fps,
     )
 
     logger.info("Evaluacion completada")
@@ -91,12 +93,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Evaluacion PINN")
     parser.add_argument("--epoca", type=int, default=2000,
                         help="Epoca del checkpoint a evaluar (default: 2000)")
+    parser.add_argument("--fps", type=int, default=60,
+                        help="Frames por segundo de los GIFs (default: 60)")
     args = parser.parse_args()
 
     configurar_logging()
     logger = logging.getLogger(__name__)
     try:
-        main(epoca=args.epoca)
+        main(epoca=args.epoca, fps=args.fps)
     except Exception as e:
         logging.getLogger(__name__).error(f"Error: {e}", exc_info=True)
         raise
