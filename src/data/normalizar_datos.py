@@ -51,7 +51,8 @@ def calcular_escalas(datos: dict, rho: float = RHO_AIRE,
     }
 
 
-def centrar_y_normalizar(datos: dict, escalas: dict) -> dict:
+def centrar_y_normalizar(datos: dict, escalas: dict,
+                         reescalar_presion: bool = False) -> dict:
     """
     Centra los datos espaciales/temporales y adimensionaliza todas las variables.
 
@@ -68,8 +69,12 @@ def centrar_y_normalizar(datos: dict, escalas: dict) -> dict:
         V_norm = V / W
         P_norm = (P - P0) / (rho * W^2)
 
+    Si reescalar_presion=True, divide P_norm por su desviacion estandar (sigma_p)
+    para equilibrar el rango de presion con el de las velocidades.
+
     :param datos: diccionario con matrices preprocesadas.
     :param escalas: diccionario retornado por calcular_escalas().
+    :param reescalar_presion: si True, reescala P_norm por sigma_p.
     :return: diccionario con datos normalizados y escalas incorporadas.
     """
     L = escalas["L"]
@@ -97,6 +102,20 @@ def centrar_y_normalizar(datos: dict, escalas: dict) -> dict:
         "numero_estaciones": datos["numero_estaciones"],
     }
 
+    if "CODIGO_ESTACION" in datos:
+        resultado["CODIGO_ESTACION"] = datos["CODIGO_ESTACION"].copy()
+
+    # Reescalado de presion (Iteracion 2): dividir por sigma_p
+    if reescalar_presion:
+        sigma_p = float(np.nanstd(resultado["P"]))
+        resultado["P"] = resultado["P"] / sigma_p
+        resultado["P_scale"] = sigma_p
+        logger.info(f"Presion reescalada: sigma_p={sigma_p:.4f}, "
+                    f"rango P_rescaled: [{np.nanmin(resultado['P']):.3f}, "
+                    f"{np.nanmax(resultado['P']):.3f}]")
+    else:
+        resultado["P_scale"] = 1.0
+
     # Guardar parametros de centrado para uso posterior (malla)
     resultado["centro_x"] = centro_x
     resultado["centro_y"] = centro_y
@@ -113,17 +132,23 @@ def centrar_y_normalizar(datos: dict, escalas: dict) -> dict:
 
 
 def normalizar(datos: dict, rho: float = RHO_AIRE,
-               nu: float = NU_AIRE) -> tuple:
+               nu: float = NU_AIRE,
+               reescalar_presion: bool = False) -> tuple:
     """
     Pipeline completo de normalizacion.
 
     :param datos: diccionario con datos preprocesados.
     :param rho: densidad del aire.
     :param nu: viscosidad cinematica.
+    :param reescalar_presion: si True, reescala P_norm por sigma_p.
     :return: tupla (datos_normalizados, escalas).
     """
     escalas = calcular_escalas(datos, rho=rho, nu=nu)
-    datos_norm = centrar_y_normalizar(datos, escalas)
+    datos_norm = centrar_y_normalizar(datos, escalas,
+                                      reescalar_presion=reescalar_presion)
+
+    # Propagar P_scale a escalas para uso posterior
+    escalas["P_scale"] = datos_norm.get("P_scale", 1.0)
 
     logger.info("Normalizacion completada")
     return datos_norm, escalas

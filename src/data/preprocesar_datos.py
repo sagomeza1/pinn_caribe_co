@@ -31,6 +31,7 @@ def proyectar_a_cartesiano(datos: dict) -> dict:
     logger.info("Proyectando coordenadas a cartesianas")
 
     resultado = {
+        "CODIGO_ESTACION": datos["codigo_estacion"].copy(),
         "T": datos["segundos"].copy(),
         "X": RADIO_TIERRA * np.sin(np.radians(datos["longitud"])),
         "Y": RADIO_TIERRA * np.sin(np.radians(datos["latitud"])),
@@ -70,6 +71,10 @@ def reestructurar_por_estacion(datos: dict) -> dict:
         n_tiempos = arr.shape[0] // n_est
         resultado[campo] = np.reshape(arr, (n_tiempos, n_est), order="F").T
 
+    codigos = datos["CODIGO_ESTACION"]
+    n_tiempos = codigos.shape[0] // n_est
+    resultado["CODIGO_ESTACION"] = np.reshape(codigos, (n_tiempos, n_est), order="F").T
+
     logger.debug(f"Dimension reestructurada: {resultado['T'].shape}")
 
     # Eliminar estaciones con NaN en ubicacion (X)
@@ -78,6 +83,7 @@ def reestructurar_por_estacion(datos: dict) -> dict:
         logger.warning(f"Eliminando {len(nan_filas)} estaciones con NaN en ubicacion")
         for campo in campos:
             resultado[campo] = np.delete(resultado[campo], nan_filas, axis=0)
+        resultado["CODIGO_ESTACION"] = np.delete(resultado["CODIGO_ESTACION"], nan_filas, axis=0)
         resultado["numero_estaciones"] = resultado["T"].shape[0]
 
     return resultado
@@ -97,7 +103,7 @@ def filtrar_tiempo_y_ordenar(datos: dict, n_dias: int = N_DIAS,
     """
     logger.info(f"Filtrando {n_dias} dias con intervalo {intervalo}")
 
-    campos = ["T", "X", "Y", "Z", "U", "V", "P", "Temp"]
+    campos = ["T", "X", "Y", "Z", "U", "V", "P", "Temp", "CODIGO_ESTACION"]
 
     # Filtro por dias: seleccionar columnas cuyo tiempo <= n_dias * 86400
     un_dia = 24 * 3600

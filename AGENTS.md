@@ -108,6 +108,13 @@ El agente NUNCA debe proponer cambios que violen alguna de estas condiciones:
 - **Entorno:** Gestión de dependencias exclusivamente mediante `requirements.txt`.
 - **Notebooks:** Solo para exploración/prototipado; el código de producción va en `src/`.
 
+## Convención obligatoria de reportes visuales (`reports/`)
+
+- Cada vez que se guarde una imagen o GIF en `reports/`, se debe crear (si no existe) una carpeta cuyo nombre relacione explícitamente la iteración (por ejemplo: `iter_03`, `epoca_2000`, `iter1_vs_iter3`).
+- Todo archivo visual generado debe guardarse dentro de la carpeta de su iteración correspondiente.
+- No se deben guardar imágenes o GIFs directamente en la raíz de `reports/`.
+- Cada carpeta de iteración debe contener únicamente resultados asociados a esa iteración del modelo.
+
 ---
 
 ## Estructura del repositorio

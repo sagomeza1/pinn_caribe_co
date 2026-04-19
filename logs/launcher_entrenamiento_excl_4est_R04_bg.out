@@ -1,0 +1,245 @@
+nohup: no se tendrá en cuenta la entrada
+[22:56:23] (INFO) Dispositivo: cuda
+[22:56:23] (INFO) Cargando datos desde em_caribe_20251201_20251231.parquet
+[22:56:23] (INFO) Registros cargados: 16,368
+[22:56:23] (INFO) Estaciones excluidas: ['0025025380', '0025025030', '0025025190', '0015015100'] (2,976 registros eliminados)
+[22:56:23] (INFO) Numero de estaciones: 18
+[22:56:23] (INFO) Proyectando coordenadas a cartesianas
+[22:56:23] (INFO) Reestructurando datos para 18 estaciones
+[22:56:23] (INFO) Filtrando 31 dias con intervalo 1
+[22:56:23] (INFO) Aplicando correccion de presion ISA a nivel del mar
+[22:56:23] (INFO) Preprocesamiento completado
+[22:56:23] (INFO) Escalas: L=405198.17 m, W=10.80 m/s, P0=100972.78 Pa, Re=316,767,061,879
+[22:56:23] (INFO) Centrando y normalizando datos de estaciones
+[22:56:23] (INFO) Normalizacion completada
+[22:56:23] (INFO) Construyendo malla PINN con R=0.4 grados
+[22:56:23] (INFO) Malla: 44 puntos espaciales x 744 timesteps = 32,736 total
+[22:56:23] (INFO) Modelo PINN: 15,890,409 parametros
+[22:56:23] (INFO) Dispositivo: cuda
+[22:56:23] (INFO) Epocas: 2,000, LR: 1.0e-04, Lambda max: 3.0
+[22:56:23] (INFO) Curriculum: 0 solo datos, 0 rampa, 2000 lambda completo
+[22:56:23] (INFO) P_scale (reescalado presion): 1.0000
+[22:56:23] (INFO) Registros estaciones: 13,265
+[22:56:23] (INFO) Registros colocacion: 32,736
+[22:56:23] (INFO) Batch estaciones: 172
+[22:56:23] (INFO) Batch colocacion: 423
+[22:56:24] (INFO) Iniciando entrenamiento
+[22:56:24] (INFO) Curriculum fase 1: solo datos (epocas 0--1)
+[22:56:28] (INFO) Cambio de LR: 0.0e+00 -> 1.0e-04
+[22:56:28] (INFO) | Epoca:    0 | Loss: 1.651e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[22:57:10] (INFO) | Epoca:   10 | Loss: 1.281e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[22:57:52] (INFO) | Epoca:   20 | Loss: 1.270e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[22:58:36] (INFO) | Epoca:   30 | Loss: 1.264e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[22:59:19] (INFO) | Epoca:   40 | Loss: 1.267e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:00:03] (INFO) | Epoca:   50 | Loss: 1.257e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:00:47] (INFO) | Epoca:   60 | Loss: 1.248e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:01:31] (INFO) | Epoca:   70 | Loss: 1.248e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:02:15] (INFO) | Epoca:   80 | Loss: 1.255e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:02:59] (INFO) | Epoca:   90 | Loss: 1.242e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:03:43] (INFO) | Epoca:  100 | Loss: 1.252e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:04:27] (INFO) | Epoca:  110 | Loss: 1.241e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:05:10] (INFO) | Epoca:  120 | Loss: 1.224e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:05:54] (INFO) | Epoca:  130 | Loss: 1.226e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:06:38] (INFO) | Epoca:  140 | Loss: 1.218e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:07:22] (INFO) | Epoca:  150 | Loss: 1.214e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:08:06] (INFO) | Epoca:  160 | Loss: 1.214e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:08:50] (INFO) | Epoca:  170 | Loss: 1.228e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:09:34] (INFO) | Epoca:  180 | Loss: 1.213e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:10:17] (INFO) | Epoca:  190 | Loss: 1.212e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:11:01] (INFO) | Epoca:  200 | Loss: 1.208e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:11:45] (INFO) | Epoca:  210 | Loss: 1.208e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:12:29] (INFO) | Epoca:  220 | Loss: 1.211e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:13:13] (INFO) | Epoca:  230 | Loss: 1.208e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:13:57] (INFO) | Epoca:  240 | Loss: 1.203e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:14:41] (INFO) | Epoca:  250 | Loss: 1.225e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:15:24] (INFO) | Epoca:  260 | Loss: 1.193e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:16:08] (INFO) | Epoca:  270 | Loss: 1.200e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:16:52] (INFO) | Epoca:  280 | Loss: 1.213e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:17:36] (INFO) | Epoca:  290 | Loss: 1.196e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:18:20] (INFO) | Epoca:  300 | Loss: 1.188e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:19:04] (INFO) | Epoca:  310 | Loss: 1.188e+00 | LR: 1.0e-04 | Lambda: 3.00 |
+[23:19:21] (INFO) Cambio de LR: 1.0e-04 -> 3.2e-05
+[23:19:48] (INFO) | Epoca:  320 | Loss: 1.171e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:20:32] (INFO) | Epoca:  330 | Loss: 1.166e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:21:16] (INFO) | Epoca:  340 | Loss: 1.164e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:21:59] (INFO) | Epoca:  350 | Loss: 1.159e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:22:43] (INFO) | Epoca:  360 | Loss: 1.156e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:23:27] (INFO) | Epoca:  370 | Loss: 1.148e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:24:11] (INFO) | Epoca:  380 | Loss: 1.136e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:24:55] (INFO) | Epoca:  390 | Loss: 1.123e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:25:39] (INFO) | Epoca:  400 | Loss: 1.113e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:26:23] (INFO) | Epoca:  410 | Loss: 1.102e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:27:07] (INFO) | Epoca:  420 | Loss: 1.092e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:27:51] (INFO) | Epoca:  430 | Loss: 1.079e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:28:35] (INFO) | Epoca:  440 | Loss: 1.080e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:29:19] (INFO) | Epoca:  450 | Loss: 1.076e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:30:02] (INFO) | Epoca:  460 | Loss: 1.060e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:30:46] (INFO) | Epoca:  470 | Loss: 1.044e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:31:30] (INFO) | Epoca:  480 | Loss: 1.048e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:32:14] (INFO) | Epoca:  490 | Loss: 1.045e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:32:53] (INFO) Checkpoint guardado: PINN_caribe_excl_4est_R04_bg_epoca_500.pth
+[23:32:53] (INFO) Historial guardado: historial_PINN_caribe_excl_4est_R04_bg.mat
+[23:32:53] (INFO) Epoca 500 con loss 1.04e+00
+[23:32:58] (INFO) | Epoca:  500 | Loss: 1.035e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:33:42] (INFO) | Epoca:  510 | Loss: 1.028e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:34:26] (INFO) | Epoca:  520 | Loss: 1.022e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:35:09] (INFO) | Epoca:  530 | Loss: 1.028e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:35:53] (INFO) | Epoca:  540 | Loss: 1.020e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:36:37] (INFO) | Epoca:  550 | Loss: 1.011e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:37:21] (INFO) | Epoca:  560 | Loss: 1.024e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:38:05] (INFO) | Epoca:  570 | Loss: 1.008e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:38:49] (INFO) | Epoca:  580 | Loss: 1.009e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:39:33] (INFO) | Epoca:  590 | Loss: 9.920e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:40:17] (INFO) | Epoca:  600 | Loss: 1.001e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:41:01] (INFO) | Epoca:  610 | Loss: 9.977e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:41:44] (INFO) | Epoca:  620 | Loss: 9.982e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:42:28] (INFO) | Epoca:  630 | Loss: 1.001e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:43:13] (INFO) | Epoca:  640 | Loss: 1.007e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:43:57] (INFO) | Epoca:  650 | Loss: 9.831e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:44:41] (INFO) | Epoca:  660 | Loss: 9.881e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:45:25] (INFO) | Epoca:  670 | Loss: 9.970e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:46:09] (INFO) | Epoca:  680 | Loss: 9.936e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:46:53] (INFO) | Epoca:  690 | Loss: 9.858e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:47:37] (INFO) | Epoca:  700 | Loss: 9.836e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:48:21] (INFO) | Epoca:  710 | Loss: 9.834e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:49:05] (INFO) | Epoca:  720 | Loss: 9.762e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:49:48] (INFO) | Epoca:  730 | Loss: 9.759e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:50:32] (INFO) | Epoca:  740 | Loss: 9.766e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:51:16] (INFO) | Epoca:  750 | Loss: 9.732e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:52:00] (INFO) | Epoca:  760 | Loss: 9.916e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:52:44] (INFO) | Epoca:  770 | Loss: 9.619e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:53:27] (INFO) | Epoca:  780 | Loss: 9.700e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:54:11] (INFO) | Epoca:  790 | Loss: 9.639e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:54:55] (INFO) | Epoca:  800 | Loss: 9.634e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:55:39] (INFO) | Epoca:  810 | Loss: 9.779e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:56:23] (INFO) | Epoca:  820 | Loss: 9.665e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:57:07] (INFO) | Epoca:  830 | Loss: 9.667e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:57:51] (INFO) | Epoca:  840 | Loss: 9.611e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:58:35] (INFO) | Epoca:  850 | Loss: 9.597e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[23:59:19] (INFO) | Epoca:  860 | Loss: 9.597e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:00:02] (INFO) | Epoca:  870 | Loss: 9.638e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:00:46] (INFO) | Epoca:  880 | Loss: 9.562e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:01:30] (INFO) | Epoca:  890 | Loss: 9.788e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:02:14] (INFO) | Epoca:  900 | Loss: 9.783e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:02:58] (INFO) | Epoca:  910 | Loss: 9.823e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:03:42] (INFO) | Epoca:  920 | Loss: 9.845e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:04:26] (INFO) | Epoca:  930 | Loss: 9.666e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:05:09] (INFO) | Epoca:  940 | Loss: 9.683e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:05:54] (INFO) | Epoca:  950 | Loss: 9.593e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:06:37] (INFO) | Epoca:  960 | Loss: 9.584e-01 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:07:21] (INFO) | Epoca:  970 | Loss: 1.007e+00 | LR: 3.2e-05 | Lambda: 3.00 |
+[00:07:47] (INFO) Cambio de LR: 3.2e-05 -> 1.0e-05
+[00:08:05] (INFO) | Epoca:  980 | Loss: 9.139e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:08:49] (INFO) | Epoca:  990 | Loss: 9.082e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:09:28] (INFO) Checkpoint guardado: PINN_caribe_excl_4est_R04_bg_epoca_1000.pth
+[00:09:28] (INFO) Historial guardado: historial_PINN_caribe_excl_4est_R04_bg.mat
+[00:09:28] (INFO) Epoca 1000 con loss 9.05e-01
+[00:09:33] (INFO) | Epoca: 1000 | Loss: 9.061e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:10:17] (INFO) | Epoca: 1010 | Loss: 8.980e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:11:01] (INFO) | Epoca: 1020 | Loss: 8.960e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:11:46] (INFO) | Epoca: 1030 | Loss: 9.085e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:12:31] (INFO) | Epoca: 1040 | Loss: 8.919e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:13:16] (INFO) | Epoca: 1050 | Loss: 8.985e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:14:01] (INFO) | Epoca: 1060 | Loss: 8.907e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:14:46] (INFO) | Epoca: 1070 | Loss: 8.992e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:15:31] (INFO) | Epoca: 1080 | Loss: 8.929e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:16:15] (INFO) | Epoca: 1090 | Loss: 9.040e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:16:59] (INFO) | Epoca: 1100 | Loss: 9.028e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:17:43] (INFO) | Epoca: 1110 | Loss: 8.869e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:18:27] (INFO) | Epoca: 1120 | Loss: 8.920e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:19:11] (INFO) | Epoca: 1130 | Loss: 8.931e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:19:55] (INFO) | Epoca: 1140 | Loss: 8.897e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:20:39] (INFO) | Epoca: 1150 | Loss: 8.810e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:21:23] (INFO) | Epoca: 1160 | Loss: 8.897e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:22:08] (INFO) | Epoca: 1170 | Loss: 8.733e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:22:53] (INFO) | Epoca: 1180 | Loss: 8.732e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:23:38] (INFO) | Epoca: 1190 | Loss: 8.903e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:24:24] (INFO) | Epoca: 1200 | Loss: 1.053e+00 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:25:08] (INFO) | Epoca: 1210 | Loss: 8.883e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:25:53] (INFO) | Epoca: 1220 | Loss: 8.938e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:26:38] (INFO) | Epoca: 1230 | Loss: 9.009e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:27:23] (INFO) | Epoca: 1240 | Loss: 8.934e-01 | LR: 1.0e-05 | Lambda: 3.00 |
+[00:27:50] (INFO) Cambio de LR: 1.0e-05 -> 3.2e-06
+[00:28:08] (INFO) | Epoca: 1250 | Loss: 8.508e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:28:52] (INFO) | Epoca: 1260 | Loss: 8.424e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:29:36] (INFO) | Epoca: 1270 | Loss: 8.416e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:30:20] (INFO) | Epoca: 1280 | Loss: 8.369e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:31:04] (INFO) | Epoca: 1290 | Loss: 8.347e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:31:49] (INFO) | Epoca: 1300 | Loss: 8.407e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:32:33] (INFO) | Epoca: 1310 | Loss: 8.497e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:33:17] (INFO) | Epoca: 1320 | Loss: 8.297e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:34:01] (INFO) | Epoca: 1330 | Loss: 8.298e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:34:45] (INFO) | Epoca: 1340 | Loss: 8.630e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:35:30] (INFO) | Epoca: 1350 | Loss: 8.344e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:36:14] (INFO) | Epoca: 1360 | Loss: 8.290e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:36:59] (INFO) | Epoca: 1370 | Loss: 8.276e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:37:43] (INFO) | Epoca: 1380 | Loss: 8.287e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:38:27] (INFO) | Epoca: 1390 | Loss: 8.202e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:39:11] (INFO) | Epoca: 1400 | Loss: 8.212e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:39:55] (INFO) | Epoca: 1410 | Loss: 8.187e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:40:39] (INFO) | Epoca: 1420 | Loss: 8.286e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:41:23] (INFO) | Epoca: 1430 | Loss: 8.507e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:42:07] (INFO) | Epoca: 1440 | Loss: 8.975e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:42:51] (INFO) | Epoca: 1450 | Loss: 8.128e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:43:36] (INFO) | Epoca: 1460 | Loss: 9.164e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:44:20] (INFO) | Epoca: 1470 | Loss: 8.247e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:45:04] (INFO) | Epoca: 1480 | Loss: 8.244e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:45:48] (INFO) | Epoca: 1490 | Loss: 8.191e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:46:28] (INFO) Checkpoint guardado: PINN_caribe_excl_4est_R04_bg_epoca_1500.pth
+[00:46:28] (INFO) Historial guardado: historial_PINN_caribe_excl_4est_R04_bg.mat
+[00:46:28] (INFO) Epoca 1500 con loss 8.70e-01
+[00:46:33] (INFO) | Epoca: 1500 | Loss: 8.533e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:47:17] (INFO) | Epoca: 1510 | Loss: 8.185e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:48:01] (INFO) | Epoca: 1520 | Loss: 8.087e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:48:44] (INFO) | Epoca: 1530 | Loss: 8.354e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:49:28] (INFO) | Epoca: 1540 | Loss: 9.673e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:50:12] (INFO) | Epoca: 1550 | Loss: 8.105e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:50:56] (INFO) | Epoca: 1560 | Loss: 8.624e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:51:40] (INFO) | Epoca: 1570 | Loss: 8.250e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:52:24] (INFO) | Epoca: 1580 | Loss: 8.033e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:53:08] (INFO) | Epoca: 1590 | Loss: 8.123e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:53:52] (INFO) | Epoca: 1600 | Loss: 8.156e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:54:36] (INFO) | Epoca: 1610 | Loss: 8.936e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:55:20] (INFO) | Epoca: 1620 | Loss: 7.954e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:56:04] (INFO) | Epoca: 1630 | Loss: 8.471e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:56:48] (INFO) | Epoca: 1640 | Loss: 9.746e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:57:32] (INFO) | Epoca: 1650 | Loss: 8.899e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:58:16] (INFO) | Epoca: 1660 | Loss: 8.056e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:59:00] (INFO) | Epoca: 1670 | Loss: 7.976e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[00:59:44] (INFO) | Epoca: 1680 | Loss: 7.968e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:00:27] (INFO) | Epoca: 1690 | Loss: 8.089e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:01:12] (INFO) | Epoca: 1700 | Loss: 1.331e+00 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:01:55] (INFO) | Epoca: 1710 | Loss: 8.412e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:02:39] (INFO) | Epoca: 1720 | Loss: 8.255e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:03:23] (INFO) | Epoca: 1730 | Loss: 8.224e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:04:07] (INFO) | Epoca: 1740 | Loss: 8.088e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:04:51] (INFO) | Epoca: 1750 | Loss: 8.303e-01 | LR: 3.2e-06 | Lambda: 3.00 |
+[01:05:17] (INFO) Cambio de LR: 3.2e-06 -> 1.0e-06
+[01:05:35] (INFO) | Epoca: 1760 | Loss: 7.849e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:06:19] (INFO) | Epoca: 1770 | Loss: 7.701e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:07:03] (INFO) | Epoca: 1780 | Loss: 7.777e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:07:47] (INFO) | Epoca: 1790 | Loss: 7.694e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:08:31] (INFO) | Epoca: 1800 | Loss: 7.697e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:09:14] (INFO) | Epoca: 1810 | Loss: 8.206e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:09:59] (INFO) | Epoca: 1820 | Loss: 7.673e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:10:44] (INFO) | Epoca: 1830 | Loss: 7.705e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:11:28] (INFO) | Epoca: 1840 | Loss: 7.662e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:12:12] (INFO) | Epoca: 1850 | Loss: 7.652e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:12:56] (INFO) | Epoca: 1860 | Loss: 7.672e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:13:40] (INFO) | Epoca: 1870 | Loss: 7.617e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:14:24] (INFO) | Epoca: 1880 | Loss: 8.488e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:15:08] (INFO) | Epoca: 1890 | Loss: 7.639e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:15:52] (INFO) | Epoca: 1900 | Loss: 7.643e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:16:36] (INFO) | Epoca: 1910 | Loss: 7.653e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:17:19] (INFO) | Epoca: 1920 | Loss: 7.680e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:18:03] (INFO) | Epoca: 1930 | Loss: 7.629e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:18:47] (INFO) | Epoca: 1940 | Loss: 7.634e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:19:31] (INFO) | Epoca: 1950 | Loss: 7.634e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:20:15] (INFO) | Epoca: 1960 | Loss: 7.596e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:20:59] (INFO) | Epoca: 1970 | Loss: 7.623e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:21:43] (INFO) | Epoca: 1980 | Loss: 7.577e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:22:27] (INFO) | Epoca: 1990 | Loss: 7.624e-01 | LR: 1.0e-06 | Lambda: 3.00 |
+[01:23:07] (INFO) Checkpoint guardado: PINN_caribe_excl_4est_R04_bg_epoca_2000.pth
+[01:23:07] (INFO) Historial guardado: historial_PINN_caribe_excl_4est_R04_bg.mat
+[01:23:07] (INFO) Epoca 2000 con loss 7.57e-01
+[01:23:07] (INFO) Entrenamiento completado

@@ -57,19 +57,23 @@ def calcular_derivadas(modelo: nn.Module, t: torch.Tensor,
 
 
 def perdida_navier_stokes(modelo: nn.Module, t: torch.Tensor,
-                          x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
+                          x: torch.Tensor, y: torch.Tensor,
+                          p_scale: float = 1.0) -> torch.Tensor:
     """
     Calcula el residuo de las ecuaciones de Navier-Stokes inviscido (Euler).
 
     Ecuaciones (adimensionalizadas):
         - Continuidad:  du/dx + dv/dy = 0
-        - Momento X:    du/dt + u*du/dx + v*du/dy + dp/dx = 0
-        - Momento Y:    dv/dt + u*dv/dx + v*dv/dy + dp/dy = 0
+        - Momento X:    du/dt + u*du/dx + v*du/dy + p_scale*dp/dx = 0
+        - Momento Y:    dv/dt + u*dv/dx + v*dv/dy + p_scale*dp/dy = 0
+
+    Si la presion fue reescalada por sigma_p, p_scale = sigma_p para compensar.
 
     :param modelo: red PINN.
     :param t: tensor de tiempo (batch, 1).
     :param x: tensor de posicion X (batch, 1).
     :param y: tensor de posicion Y (batch, 1).
+    :param p_scale: factor de reescalado de presion (1.0 si no se reescalo).
     :return: perdida escalar (MSE de los tres residuos contra cero).
     """
     u, v, p, u_t, u_x, u_y, v_t, v_x, v_y, p_x, p_y = calcular_derivadas(modelo, t, x, y)
@@ -77,9 +81,9 @@ def perdida_navier_stokes(modelo: nn.Module, t: torch.Tensor,
     ceros = torch.zeros_like(u)
 
     # Residuos
-    e1 = u_x + v_y                              # Continuidad
-    e2 = u_t + (u * u_x + v * u_y) + p_x        # Momento X
-    e3 = v_t + (u * v_x + v * v_y) + p_y        # Momento Y
+    e1 = u_x + v_y                                           # Continuidad
+    e2 = u_t + (u * u_x + v * u_y) + p_scale * p_x          # Momento X
+    e3 = v_t + (u * v_x + v * v_y) + p_scale * p_y          # Momento Y
 
     return mse(e1, ceros) + mse(e2, ceros) + mse(e3, ceros)
 

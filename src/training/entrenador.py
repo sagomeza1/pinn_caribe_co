@@ -29,6 +29,7 @@ from config.settings import (
     LAMBDA_FISICA, NUM_EPOCAS, LR_INICIAL, MAX_NORM_GRAD,
     SCHEDULER_FACTOR, SCHEDULER_PATIENCE, SCHEDULER_THRESHOLD,
     CHECKPOINT_INTERVALO, RUTA_MODELOS, R_MALLA, N_DIAS,
+    EPOCAS_SOLO_DATOS, EPOCAS_RAMPA,
 )
 from src.model.perdida_fisica import perdida_navier_stokes, perdida_datos
 
@@ -46,6 +47,9 @@ def entrenar(
     max_norm: float = MAX_NORM_GRAD,
     checkpoint_intervalo: int = CHECKPOINT_INTERVALO,
     nombre_modelo: str = "PINN_caribe",
+    p_scale: float = 1.0,
+    epocas_solo_datos: int = EPOCAS_SOLO_DATOS,
+    epocas_rampa: int = EPOCAS_RAMPA,
 ) -> dict:
     """
     Ejecuta el bucle de entrenamiento de la PINN.
@@ -57,20 +61,32 @@ def entrenar(
     La perdida fisica se calcula tanto en puntos de estaciones como en puntos
     de colocacion (malla).
 
+    Curriculum learning (Iteracion 2):
+        - Fase 1 (epocas 0 a epocas_solo_datos-1): lambda=0 (solo datos)
+        - Fase 2 (rampa lineal): lambda de 0 a lamb
+        - Fase 3 (restantes): lambda=lamb completo
+
     :param modelo: red PINN a entrenar.
     :param dataset_estaciones: EstacionesDataset con datos observados.
     :param dataset_colocacion: ColocacionDataset con puntos de la malla.
     :param device: dispositivo (cuda o cpu).
     :param lr: learning rate inicial.
-    :param lamb: peso de la perdida fisica.
+    :param lamb: peso maximo de la perdida fisica.
     :param num_epocas: numero de epocas.
     :param max_norm: norma maxima para gradient clipping.
     :param checkpoint_intervalo: guardar checkpoint cada N epocas.
     :param nombre_modelo: prefijo del nombre de archivos de checkpoint.
+    :param p_scale: factor de reescalado de presion para las ecuaciones N-S.
+    :param epocas_solo_datos: epocas iniciales con lambda=0 (curriculum).
+    :param epocas_rampa: epocas de rampa lineal de lambda (curriculum).
     :return: diccionario con el historial de entrenamiento.
     """
     logger.info(f"Dispositivo: {device}")
-    logger.info(f"Epocas: {num_epocas:,}, LR: {lr:.1e}, Lambda: {lamb}")
+    logger.info(f"Epocas: {num_epocas:,}, LR: {lr:.1e}, Lambda max: {lamb}")
+    logger.info(f"Curriculum: {epocas_solo_datos} solo datos, "
+                f"{epocas_rampa} rampa, "
+                f"{num_epocas - epocas_solo_datos - epocas_rampa} lambda completo")
+    logger.info(f"P_scale (reescalado presion): {p_scale:.4f}")
 
     # Mover modelo a GPU
     modelo.to(device)
@@ -107,6 +123,7 @@ def entrenar(
     historial = {
         "epoch": [], "loss": [], "ns_loss": [],
         "p_loss": [], "u_loss": [], "v_loss": [], "lr": [],
+        "lambda_efecto": [],
     }
 
     RUTA_MODELOS.mkdir(parents=True, exist_ok=True)
@@ -116,6 +133,24 @@ def entrenar(
 
     for epoca in range(num_epocas):
         modelo.train()
+
+        # Curriculum learning: calcular lambda efectivo para esta epoca
+        if epoca < epocas_solo_datos:
+            lambda_efecto = 0.0
+        elif epoca < epocas_solo_datos + epocas_rampa:
+            progreso = (epoca - epocas_solo_datos) / epocas_rampa
+            lambda_efecto = lamb * progreso
+        else:
+            lambda_efecto = lamb
+
+        # Logging de transiciones de fase
+        if epoca == 0:
+            logger.info(f"Curriculum fase 1: solo datos (epocas 0-{epocas_solo_datos - 1})")
+        elif epoca == epocas_solo_datos:
+            logger.info(f"Curriculum fase 2: rampa lambda "
+                        f"(epocas {epocas_solo_datos}-{epocas_solo_datos + epocas_rampa - 1})")
+        elif epoca == epocas_solo_datos + epocas_rampa:
+            logger.info(f"Curriculum fase 3: lambda completo = {lamb}")
 
         acum_loss = 0.0
         acum_ns = 0.0
@@ -133,10 +168,15 @@ def entrenar(
 
             optimizador.zero_grad()
 
-            # 1. Perdida fisica (NS) en malla y en puntos de estaciones
-            loss_ns_malla = perdida_navier_stokes(modelo, t_f, x_f, y_f)
-            loss_ns_datos = perdida_navier_stokes(modelo, t_u, x_u, y_u)
-            loss_fisica = lamb * (loss_ns_malla + loss_ns_datos)
+            # 1. Perdida fisica (NS) — solo si lambda_efecto > 0
+            if lambda_efecto > 0:
+                loss_ns_malla = perdida_navier_stokes(modelo, t_f, x_f, y_f,
+                                                      p_scale=p_scale)
+                loss_ns_datos = perdida_navier_stokes(modelo, t_u, x_u, y_u,
+                                                      p_scale=p_scale)
+                loss_fisica = lambda_efecto * (loss_ns_malla + loss_ns_datos)
+            else:
+                loss_fisica = torch.tensor(0.0, device=device)
 
             # 2. Perdida de datos (prediccion vs observacion)
             salida = modelo(t_u, x_u, y_u)
@@ -173,7 +213,7 @@ def entrenar(
         avg_v = acum_v / n_batches
         avg_p = acum_p / n_batches
 
-        if avg_ns < 1e-5:
+        if avg_ns < 1e-5 and lambda_efecto > 0:
             logger.warning(f"Loss NS muy bajo: {avg_ns:.3e}")
 
         # Actualizar scheduler
@@ -192,15 +232,18 @@ def entrenar(
         historial["v_loss"].append(avg_v)
         historial["p_loss"].append(avg_p)
         historial["lr"].append(lr_actual)
+        historial["lambda_efecto"].append(lambda_efecto)
 
         # Logging
         if epoca % 10 == 0:
             logger.info(
-                f"| Epoca: {epoca:4} | Loss: {avg_loss:.3e} | LR: {lr_actual:.1e} |"
+                f"| Epoca: {epoca:4} | Loss: {avg_loss:.3e} | LR: {lr_actual:.1e} "
+                f"| Lambda: {lambda_efecto:.2f} |"
             )
         logger.debug(
             f"|Epoca: {epoca:4}|Loss: {avg_loss:.3e}|NS: {avg_ns:.3e}"
-            f"|U: {avg_u:.3e}|V: {avg_v:.3e}|P: {avg_p:.3e}|LR: {lr_actual:.1e}|"
+            f"|U: {avg_u:.3e}|V: {avg_v:.3e}|P: {avg_p:.3e}"
+            f"|LR: {lr_actual:.1e}|Lambda: {lambda_efecto:.2f}|"
         )
 
         # Checkpoint periodico
@@ -212,6 +255,7 @@ def entrenar(
                 "optimizer_state_dict": optimizador.state_dict(),
                 "scheduler_state_dict": scheduler.state_dict(),
                 "loss": avg_loss,
+                "p_scale": p_scale,
             }, ruta_ckpt)
             logger.info(f"Checkpoint guardado: {ruta_ckpt.name}")
 

@@ -63,6 +63,13 @@ pinn/
 - **Datos de aprendizaje:** Siempre normalizados y centralizados antes de entrenar.
 - **Información espacial/temporal:** No alterar su significado conceptual durante el preprocesamiento.
 
+## Convención obligatoria de reportes visuales (`reports/`)
+
+- Toda imagen o GIF nuevo en `reports/` debe almacenarse dentro de una carpeta cuyo nombre esté relacionado con la iteración del modelo.
+- Si la carpeta de iteración no existe, se crea antes de guardar el archivo.
+- No se guardan imágenes o GIFs directamente en la raíz de `reports/`.
+- Cada carpeta de iteración debe contener exclusivamente contenido relacionado con esa iteración.
+
 ## Datos faltantes y ambigüedad
 
 - Los datos faltantes no se eliminan automáticamente; su uso depende de la variable objetivo.

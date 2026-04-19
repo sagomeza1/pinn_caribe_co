@@ -18,7 +18,9 @@ from config.logging_config import configurar_logging
 from config.settings import (
     ARCHIVO_PARQUET, LAMBDA_FISICA, NUM_EPOCAS, LR_INICIAL,
     MAX_NORM_GRAD, HIDDEN_NEURONS, R_MALLA, N_DIAS, INTERVALO,
-    CHECKPOINT_INTERVALO,
+    CHECKPOINT_INTERVALO, REESCALAR_PRESION,
+    EPOCAS_SOLO_DATOS, EPOCAS_RAMPA,
+    NOMBRE_MODELO_ENTRENAMIENTO, NOMBRE_LOG_ENTRENAMIENTO,
 )
 from src.data.cargar_datos import cargar_parquet
 from src.data.preprocesar_datos import preprocesar
@@ -41,7 +43,8 @@ def main():
     datos_prep = preprocesar(datos, n_dias=N_DIAS, intervalo=INTERVALO)
 
     # ── 3. Normalizacion ─────────────────────────────────────────────
-    datos_norm, escalas = normalizar(datos_prep)
+    datos_norm, escalas = normalizar(datos_prep,
+                                     reescalar_presion=REESCALAR_PRESION)
 
     # ── 4. Construccion de malla ─────────────────────────────────────
     malla = construir_malla(datos_norm, escalas, R=R_MALLA)
@@ -57,6 +60,7 @@ def main():
     logger.debug(modelo)
 
     # ── 7. Entrenamiento ─────────────────────────────────────────────
+    p_scale = escalas.get("P_scale", 1.0)
     entrenar(
         modelo=modelo,
         dataset_estaciones=dataset_estaciones,
@@ -67,11 +71,15 @@ def main():
         num_epocas=NUM_EPOCAS,
         max_norm=MAX_NORM_GRAD,
         checkpoint_intervalo=CHECKPOINT_INTERVALO,
+        nombre_modelo=NOMBRE_MODELO_ENTRENAMIENTO,
+        p_scale=p_scale,
+        epocas_solo_datos=EPOCAS_SOLO_DATOS,
+        epocas_rampa=EPOCAS_RAMPA,
     )
 
 
 if __name__ == "__main__":
-    configurar_logging()
+    configurar_logging(NOMBRE_LOG_ENTRENAMIENTO)
     logger = logging.getLogger(__name__)
     try:
         main()
