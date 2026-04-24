@@ -36,6 +36,45 @@ from src.model.perdida_fisica import perdida_navier_stokes, perdida_datos
 logger = logging.getLogger(__name__)
 
 
+def _guardar_estado_entrenamiento(
+    nombre_modelo: str,
+    epoca: int,
+    modelo: nn.Module,
+    optimizador: optim.Optimizer,
+    scheduler,
+    avg_loss: float,
+    p_scale: float,
+    historial: dict,
+) -> None:
+    """Guarda checkpoint e historial del entrenamiento.
+
+    :param nombre_modelo: prefijo de archivos de salida.
+    :param epoca: epoca actual base cero.
+    :param modelo: red entrenada.
+    :param optimizador: optimizador activo.
+    :param scheduler: scheduler activo.
+    :param avg_loss: loss promedio de la epoca.
+    :param p_scale: factor de reescalado de presion.
+    :param historial: historial acumulado.
+    :return: None.
+    """
+    ruta_ckpt = RUTA_MODELOS / f"{nombre_modelo}_epoca_{epoca + 1}.pth"
+    torch.save({
+        "epoch": epoca,
+        "model_state_dict": modelo.state_dict(),
+        "optimizer_state_dict": optimizador.state_dict(),
+        "scheduler_state_dict": scheduler.state_dict(),
+        "loss": avg_loss,
+        "p_scale": p_scale,
+    }, ruta_ckpt)
+    logger.info(f"Checkpoint guardado: {ruta_ckpt.name}")
+
+    ruta_hist = RUTA_MODELOS / f"historial_{nombre_modelo}.mat"
+    sio.savemat(str(ruta_hist), historial)
+    logger.info(f"Historial guardado: {ruta_hist.name}")
+    logger.info(f"Epoca {epoca + 1} con loss {avg_loss:.2e}")
+
+
 def entrenar(
     modelo: nn.Module,
     dataset_estaciones,
@@ -50,6 +89,8 @@ def entrenar(
     p_scale: float = 1.0,
     epocas_solo_datos: int = EPOCAS_SOLO_DATOS,
     epocas_rampa: int = EPOCAS_RAMPA,
+    r_malla: float = R_MALLA,
+    n_dias: int = N_DIAS,
 ) -> dict:
     """
     Ejecuta el bucle de entrenamiento de la PINN.
@@ -79,10 +120,13 @@ def entrenar(
     :param p_scale: factor de reescalado de presion para las ecuaciones N-S.
     :param epocas_solo_datos: epocas iniciales con lambda=0 (curriculum).
     :param epocas_rampa: epocas de rampa lineal de lambda (curriculum).
+    :param r_malla: resolucion de la malla para el calculo de batches.
+    :param n_dias: horizonte temporal usado para escalar el batch size.
     :return: diccionario con el historial de entrenamiento.
     """
     logger.info(f"Dispositivo: {device}")
     logger.info(f"Epocas: {num_epocas:,}, LR: {lr:.1e}, Lambda max: {lamb}")
+    logger.info(f"Configuracion corrida: R={r_malla}, n_dias={n_dias}")
     logger.info(f"Curriculum: {epocas_solo_datos} solo datos, "
                 f"{epocas_rampa} rampa, "
                 f"{num_epocas - epocas_solo_datos - epocas_rampa} lambda completo")
@@ -92,8 +136,8 @@ def entrenar(
     modelo.to(device)
 
     # Tamanos de batch (replica logica del proyecto base)
-    batch_estaciones = int(np.ceil(len(dataset_estaciones) / N_DIAS * R_MALLA))
-    batch_colocacion = int(np.ceil(len(dataset_colocacion) / N_DIAS * R_MALLA))
+    batch_estaciones = max(1, int(np.ceil(len(dataset_estaciones) / n_dias * r_malla)))
+    batch_colocacion = max(1, int(np.ceil(len(dataset_colocacion) / n_dias * r_malla)))
 
     logger.info(f"Registros estaciones: {len(dataset_estaciones):,}")
     logger.info(f"Registros colocacion: {len(dataset_colocacion):,}")
@@ -248,22 +292,28 @@ def entrenar(
 
         # Checkpoint periodico
         if (epoca + 1) % checkpoint_intervalo == 0:
-            ruta_ckpt = RUTA_MODELOS / f"{nombre_modelo}_epoca_{epoca + 1}.pth"
-            torch.save({
-                "epoch": epoca,
-                "model_state_dict": modelo.state_dict(),
-                "optimizer_state_dict": optimizador.state_dict(),
-                "scheduler_state_dict": scheduler.state_dict(),
-                "loss": avg_loss,
-                "p_scale": p_scale,
-            }, ruta_ckpt)
-            logger.info(f"Checkpoint guardado: {ruta_ckpt.name}")
+            _guardar_estado_entrenamiento(
+                nombre_modelo=nombre_modelo,
+                epoca=epoca,
+                modelo=modelo,
+                optimizador=optimizador,
+                scheduler=scheduler,
+                avg_loss=avg_loss,
+                p_scale=p_scale,
+                historial=historial,
+            )
 
-            # Guardar historial como .mat
-            ruta_hist = RUTA_MODELOS / f"historial_{nombre_modelo}.mat"
-            sio.savemat(str(ruta_hist), historial)
-            logger.info(f"Historial guardado: {ruta_hist.name}")
-            logger.info(f"Epoca {epoca + 1} con loss {avg_loss:.2e}")
+    if num_epocas % checkpoint_intervalo != 0:
+        _guardar_estado_entrenamiento(
+            nombre_modelo=nombre_modelo,
+            epoca=num_epocas - 1,
+            modelo=modelo,
+            optimizador=optimizador,
+            scheduler=scheduler,
+            avg_loss=historial["loss"][-1],
+            p_scale=p_scale,
+            historial=historial,
+        )
 
     logger.info("Entrenamiento completado")
     return historial

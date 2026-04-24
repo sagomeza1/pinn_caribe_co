@@ -1,0 +1,11 @@
+{
+  "nombre_modelo": "PINN_caribe_excl4_300xest_R04_L5",
+  "nombre_experimento": "PINN_caribe_excl4_300xest_R04_L5",
+  "epoca": 2000,
+  "mse_u": 0.7709931135177612,
+  "mse_v": 0.7817241549491882,
+  "mse_p": 2.411072015762329,
+  "residual_ns": 0.07074005901813507,
+  "ruta_checkpoint": "/home/investigadoroic/Documentos/pinn/models/PINN_caribe_excl4_300xest_R04_L5_epoca_2000.pth",
+  "ruta_reporte": "/home/investigadoroic/Documentos/pinn/reports/iter_R04_analisis_20260423/PINN_caribe_excl4_300xest_R04_L5"
+}

@@ -155,6 +155,7 @@ def generar_todos_los_gifs(
     escalas: dict,
     device: torch.device,
     prefijo: str = "pinn",
+    ruta_salida: Path = RUTA_REPORTES,
     fps: int = 60,
 ) -> None:
     """
@@ -166,6 +167,7 @@ def generar_todos_los_gifs(
     :param escalas: diccionario con escalas de referencia.
     :param device: dispositivo.
     :param prefijo: prefijo del nombre de archivos.
+    :param ruta_salida: directorio donde guardar los GIFs.
     :param fps: frames por segundo del GIF.
     """
     for var in ["u", "v", "p"]:
@@ -177,5 +179,6 @@ def generar_todos_los_gifs(
             variable=var,
             nombre_archivo=f"{prefijo}_{var}",
             device=device,
+            ruta_salida=ruta_salida,
             fps=fps,
         )
