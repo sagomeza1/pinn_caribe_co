@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+from pathlib import Path
 
 from config.logging_config import configurar_logging
 from config.settings import RAIZ_PROYECTO
@@ -83,7 +84,7 @@ def main() -> None:
     logger.info("Corridas preparadas: %s", len(comandos))
 
     if args.consolidar_al_final and not args.dry_run:
-        ruta_csv = exportar_resumen_barrido_csv(args.ruta_csv)
+        ruta_csv = exportar_resumen_barrido_csv(Path(args.ruta_csv))
         logger.info("CSV comparativo regenerado: %s", ruta_csv)
 
 
