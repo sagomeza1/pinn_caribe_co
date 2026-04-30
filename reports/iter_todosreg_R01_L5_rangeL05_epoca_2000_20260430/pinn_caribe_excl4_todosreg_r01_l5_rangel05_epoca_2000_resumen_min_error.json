@@ -1,0 +1,25 @@
+{
+  "experimento": "PINN_caribe_excl4_todosreg_R01_L5_rangeL05",
+  "modelo": "PINN_caribe_excl4_todosreg_R01_L5_rangeL05",
+  "epoca": 2000,
+  "min_error_promedio": {
+    "u": {
+      "timestep": 138,
+      "segundos": 496800.0,
+      "mae": 0.2396048914959847,
+      "imagen": "/home/investigadoroic/Documentos/pinn/reports/iter_todosreg_R01_L5_rangeL05_epoca_2000_20260430/pinn_caribe_excl4_todosreg_r01_l5_rangel05_epoca_2000_frame_min_error_u_t138.png"
+    },
+    "v": {
+      "timestep": 134,
+      "segundos": 482400.0,
+      "mae": 0.21857247344872055,
+      "imagen": "/home/investigadoroic/Documentos/pinn/reports/iter_todosreg_R01_L5_rangeL05_epoca_2000_20260430/pinn_caribe_excl4_todosreg_r01_l5_rangel05_epoca_2000_frame_min_error_v_t134.png"
+    },
+    "p": {
+      "timestep": 306,
+      "segundos": 1101600.0,
+      "mae": 0.4876087755901023,
+      "imagen": "/home/investigadoroic/Documentos/pinn/reports/iter_todosreg_R01_L5_rangeL05_epoca_2000_20260430/pinn_caribe_excl4_todosreg_r01_l5_rangel05_epoca_2000_frame_min_error_p_t306.png"
+    }
+  }
+}

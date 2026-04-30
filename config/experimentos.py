@@ -6,10 +6,14 @@ from pathlib import Path
 from config.settings import (
     ARCHIVO_PARQUET,
     CHECKPOINT_INTERVALO,
+    CUANTIL_MAX,
+    CUANTIL_MIN,
+    EPOCAS_RAMPA_RANGO,
     EPOCAS_RAMPA,
     EPOCAS_SOLO_DATOS,
     ESTACIONES_EXCLUIDAS,
     INTERVALO,
+    LAMBDA_RANGO_MAX,
     LR_INICIAL,
     LAMBDA_FISICA,
     MAX_NORM_GRAD,
@@ -19,6 +23,8 @@ from config.settings import (
     NUM_EPOCAS,
     R_MALLA,
     REESCALAR_PRESION,
+    TAU_RANGO,
+    USAR_CUANTILES_RANGO,
 )
 
 
@@ -53,6 +59,12 @@ class ConfiguracionExperimento:
     :param reescalar_presion: activa reescalado de presion.
     :param epocas_solo_datos: epocas iniciales sin perdida fisica.
     :param epocas_rampa: epocas de rampa lineal para lambda.
+    :param lambda_rango_max: peso maximo de la restriccion suave de rango.
+    :param epocas_rampa_rango: epocas de rampa para lambda_rango.
+    :param tau_rango: temperatura de suavizado de la penalizacion.
+    :param usar_cuantiles_rango: si True usa cuantiles en lugar de min/max.
+    :param cuantil_min: cuantil inferior para limites robustos.
+    :param cuantil_max: cuantil superior para limites robustos.
     :param estaciones_excluidas: estaciones excluidas del entrenamiento.
     :param registros_por_estacion: limite por estacion; None conserva todo.
     """
@@ -72,6 +84,12 @@ class ConfiguracionExperimento:
     reescalar_presion: bool = REESCALAR_PRESION
     epocas_solo_datos: int = EPOCAS_SOLO_DATOS
     epocas_rampa: int = EPOCAS_RAMPA
+    lambda_rango_max: float = LAMBDA_RANGO_MAX
+    epocas_rampa_rango: int = EPOCAS_RAMPA_RANGO
+    tau_rango: float = TAU_RANGO
+    usar_cuantiles_rango: bool = USAR_CUANTILES_RANGO
+    cuantil_min: float = CUANTIL_MIN
+    cuantil_max: float = CUANTIL_MAX
     estaciones_excluidas: list[str] = field(
         default_factory=lambda: list(ESTACIONES_EXCLUIDAS)
     )

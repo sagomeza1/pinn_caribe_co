@@ -15,6 +15,11 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+from config.settings import (
+    CUANTIL_MAX,
+    CUANTIL_MIN,
+    USAR_CUANTILES_RANGO,
+)
 from src.model.perdida_fisica import perdida_navier_stokes
 
 logger = logging.getLogger(__name__)
@@ -268,7 +273,10 @@ def graficar_mse_por_estacion_en_tiempo(
 
 def evaluar_metricas(modelo: nn.Module, dataset_estaciones,
                      device: torch.device,
-                     p_scale: float = 1.0) -> dict:
+                     p_scale: float = 1.0,
+                     usar_cuantiles_rango: bool = USAR_CUANTILES_RANGO,
+                     cuantil_min: float = CUANTIL_MIN,
+                     cuantil_max: float = CUANTIL_MAX) -> dict:
     """
     Evalua MSE por variable y residual NS en los datos de estaciones.
 
@@ -276,7 +284,10 @@ def evaluar_metricas(modelo: nn.Module, dataset_estaciones,
     :param dataset_estaciones: EstacionesDataset con datos observados.
     :param device: dispositivo.
     :param p_scale: factor de reescalado de presion para las ecuaciones N-S.
-    :return: diccionario con mse_u, mse_v, mse_p, residual_ns.
+    :param usar_cuantiles_rango: si True usa cuantiles para limites de rango.
+    :param cuantil_min: cuantil inferior para limites de rango.
+    :param cuantil_max: cuantil superior para limites de rango.
+    :return: diccionario con mse_u, mse_v, mse_p, residual_ns y FOR por variable.
     """
     modelo.eval()
     mse = nn.MSELoss()
@@ -299,6 +310,25 @@ def evaluar_metricas(modelo: nn.Module, dataset_estaciones,
         mse_v = mse(v_pred, v_true).item()
         mse_p = mse(p_pred, p_true).item()
 
+        if usar_cuantiles_rango:
+            lim_u_inf = torch.quantile(u_true.squeeze(), cuantil_min)
+            lim_u_sup = torch.quantile(u_true.squeeze(), cuantil_max)
+            lim_v_inf = torch.quantile(v_true.squeeze(), cuantil_min)
+            lim_v_sup = torch.quantile(v_true.squeeze(), cuantil_max)
+            lim_p_inf = torch.quantile(p_true.squeeze(), cuantil_min)
+            lim_p_sup = torch.quantile(p_true.squeeze(), cuantil_max)
+        else:
+            lim_u_inf = torch.min(u_true)
+            lim_u_sup = torch.max(u_true)
+            lim_v_inf = torch.min(v_true)
+            lim_v_sup = torch.max(v_true)
+            lim_p_inf = torch.min(p_true)
+            lim_p_sup = torch.max(p_true)
+
+        for_u = ((u_pred < lim_u_inf) | (u_pred > lim_u_sup)).float().mean().item()
+        for_v = ((v_pred < lim_v_inf) | (v_pred > lim_v_sup)).float().mean().item()
+        for_p = ((p_pred < lim_p_inf) | (p_pred > lim_p_sup)).float().mean().item()
+
     # Residual NS requiere gradientes (no se puede usar no_grad)
     t_ns = dataset_estaciones.t.to(device)
     x_ns = dataset_estaciones.x.to(device)
@@ -308,10 +338,20 @@ def evaluar_metricas(modelo: nn.Module, dataset_estaciones,
 
     logger.info(f"MSE u: {mse_u:.3e} | MSE v: {mse_v:.3e} | MSE p: {mse_p:.3e}")
     logger.info(f"Residual NS: {residual_ns:.3e}")
+    logger.info(f"FOR u: {for_u:.2%} | FOR v: {for_v:.2%} | FOR p: {for_p:.2%}")
 
     return {
         "mse_u": mse_u,
         "mse_v": mse_v,
         "mse_p": mse_p,
         "residual_ns": residual_ns,
+        "for_u": for_u,
+        "for_v": for_v,
+        "for_p": for_p,
+        "lim_u_inf": lim_u_inf.item(),
+        "lim_u_sup": lim_u_sup.item(),
+        "lim_v_inf": lim_v_inf.item(),
+        "lim_v_sup": lim_v_sup.item(),
+        "lim_p_inf": lim_p_inf.item(),
+        "lim_p_sup": lim_p_sup.item(),
     }

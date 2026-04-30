@@ -67,6 +67,14 @@ EPOCAS_SOLO_DATOS = 0          # epocas iniciales solo con datos (lambda=0)
 EPOCAS_RAMPA = 0               # epocas de rampa lineal 0 -> LAMBDA_FISICA
 REESCALAR_PRESION = False       # dividir P_norm por sigma_p para equilibrar rangos
 
+# Range loss (restriccion suave de rango en salidas)
+LAMBDA_RANGO_MAX = 0.5         # peso maximo de la perdida de rango
+EPOCAS_RAMPA_RANGO = 300       # epocas de rampa lineal 0 -> LAMBDA_RANGO_MAX
+TAU_RANGO = 0.05               # temperatura de suavizado para softplus
+USAR_CUANTILES_RANGO = True    # usar cuantiles robustos para limites de rango
+CUANTIL_MIN = 0.01             # cuantil inferior para limites robustos
+CUANTIL_MAX = 0.99             # cuantil superior para limites robustos
+
 # ──────────────────────────────────────────────────────────────────────
 # Arquitectura de la red
 # ──────────────────────────────────────────────────────────────────────

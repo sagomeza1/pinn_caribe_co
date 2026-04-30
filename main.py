@@ -11,10 +11,16 @@ from config.experimentos import (
 )
 from config.logging_config import configurar_logging
 from config.settings import (
+    CUANTIL_MAX,
+    CUANTIL_MIN,
+    EPOCAS_RAMPA_RANGO,
     HIDDEN_NEURONS,
+    LAMBDA_RANGO_MAX,
     LAMBDA_FISICA,
     NUM_EPOCAS,
     R_MALLA,
+    TAU_RANGO,
+    USAR_CUANTILES_RANGO,
 )
 from src.data.cargar_datos import cargar_parquet
 from src.data.preprocesar_datos import preprocesar
@@ -49,6 +55,22 @@ def construir_parser() -> argparse.ArgumentParser:
                         help="Numero de epocas del entrenamiento")
     parser.add_argument("--registros-por-estacion", type=int, default=None,
                         help="Limite de registros por estacion")
+    parser.add_argument("--lambda-rango-max", type=float, default=LAMBDA_RANGO_MAX,
+                        help="Peso maximo de la perdida suave de rango")
+    parser.add_argument("--epocas-rampa-rango", type=int, default=EPOCAS_RAMPA_RANGO,
+                        help="Epocas de rampa lineal de lambda_rango")
+    parser.add_argument("--tau-rango", type=float, default=TAU_RANGO,
+                        help="Temperatura de suavizado para la perdida de rango")
+    parser.add_argument("--usar-cuantiles-rango", action="store_true",
+                        default=USAR_CUANTILES_RANGO,
+                        help="Usa cuantiles robustos para limites de rango")
+    parser.add_argument("--minmax-rango", action="store_false",
+                        dest="usar_cuantiles_rango",
+                        help="Fuerza limites min/max en lugar de cuantiles")
+    parser.add_argument("--cuantil-min", type=float, default=CUANTIL_MIN,
+                        help="Cuantil inferior de limites de rango")
+    parser.add_argument("--cuantil-max", type=float, default=CUANTIL_MAX,
+                        help="Cuantil superior de limites de rango")
     return parser
 
 
@@ -60,7 +82,7 @@ def construir_configuracion_desde_args(
     :param args: argumentos parseados.
     :return: configuracion reusable del experimento.
     """
-    return construir_configuracion_experimento(
+    configuracion = construir_configuracion_experimento(
         nombre_experimento=args.nombre_experimento,
         nombre_modelo=args.nombre_modelo,
         nombre_log=args.nombre_log,
@@ -71,6 +93,13 @@ def construir_configuracion_desde_args(
         num_epocas=args.num_epocas if args.num_epocas is not None else NUM_EPOCAS,
         registros_por_estacion=args.registros_por_estacion,
     )
+    configuracion.lambda_rango_max = args.lambda_rango_max
+    configuracion.epocas_rampa_rango = args.epocas_rampa_rango
+    configuracion.tau_rango = args.tau_rango
+    configuracion.usar_cuantiles_rango = args.usar_cuantiles_rango
+    configuracion.cuantil_min = args.cuantil_min
+    configuracion.cuantil_max = args.cuantil_max
+    return configuracion
 
 
 def main(configuracion: ConfiguracionExperimento):
@@ -133,6 +162,12 @@ def main(configuracion: ConfiguracionExperimento):
         p_scale=p_scale,
         epocas_solo_datos=configuracion.epocas_solo_datos,
         epocas_rampa=configuracion.epocas_rampa,
+        lambda_rango_max=configuracion.lambda_rango_max,
+        epocas_rampa_rango=configuracion.epocas_rampa_rango,
+        tau_rango=configuracion.tau_rango,
+        usar_cuantiles_rango=configuracion.usar_cuantiles_rango,
+        cuantil_min=configuracion.cuantil_min,
+        cuantil_max=configuracion.cuantil_max,
         r_malla=configuracion.r_malla,
         n_dias=configuracion.n_dias,
     )

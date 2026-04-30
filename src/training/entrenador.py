@@ -26,14 +26,83 @@ from pathlib import Path
 from torch.utils.data import DataLoader
 
 from config.settings import (
+    CUANTIL_MAX,
+    CUANTIL_MIN,
+    EPOCAS_RAMPA_RANGO,
     LAMBDA_FISICA, NUM_EPOCAS, LR_INICIAL, MAX_NORM_GRAD,
+    LAMBDA_RANGO_MAX,
     SCHEDULER_FACTOR, SCHEDULER_PATIENCE, SCHEDULER_THRESHOLD,
     CHECKPOINT_INTERVALO, RUTA_MODELOS, R_MALLA, N_DIAS,
+    TAU_RANGO,
     EPOCAS_SOLO_DATOS, EPOCAS_RAMPA,
+    USAR_CUANTILES_RANGO,
 )
 from src.model.perdida_fisica import perdida_navier_stokes, perdida_datos
 
 logger = logging.getLogger(__name__)
+
+
+def _calcular_limites_rango(
+    dataset_estaciones,
+    usar_cuantiles: bool,
+    cuantil_min: float,
+    cuantil_max: float,
+) -> dict[str, torch.Tensor]:
+    """Calcula limites inferior/superior por variable en datos observados.
+
+    :param dataset_estaciones: dataset de estaciones con tensores u, v, p.
+    :param usar_cuantiles: si True usa cuantiles robustos; si False usa min/max.
+    :param cuantil_min: cuantil inferior en [0, 1].
+    :param cuantil_max: cuantil superior en [0, 1].
+    :return: diccionario con limites por variable (u, v, p).
+    :raises ValueError: si los cuantiles no estan en rango valido.
+    """
+    if not (0.0 <= cuantil_min < cuantil_max <= 1.0):
+        raise ValueError("Los cuantiles de rango deben cumplir 0 <= min < max <= 1")
+
+    limites = {}
+    for nombre, tensor in {
+        "u": dataset_estaciones.u.squeeze(),
+        "v": dataset_estaciones.v.squeeze(),
+        "p": dataset_estaciones.p.squeeze(),
+    }.items():
+        if usar_cuantiles:
+            lim_inf = torch.quantile(tensor, cuantil_min)
+            lim_sup = torch.quantile(tensor, cuantil_max)
+        else:
+            lim_inf = torch.min(tensor)
+            lim_sup = torch.max(tensor)
+
+        limites[nombre] = {
+            "inf": lim_inf.detach(),
+            "sup": lim_sup.detach(),
+        }
+
+    return limites
+
+
+def _penalizacion_rango_suave(
+    pred: torch.Tensor,
+    lim_inf: torch.Tensor,
+    lim_sup: torch.Tensor,
+    tau: float,
+) -> tuple[torch.Tensor, torch.Tensor]:
+    """Calcula penalizacion suave y porcentaje fuera de rango.
+
+    :param pred: predicciones de una variable con forma (N, 1).
+    :param lim_inf: limite inferior escalar.
+    :param lim_sup: limite superior escalar.
+    :param tau: temperatura de suavizado (>0).
+    :return: tupla (perdida_suave, porcentaje_fuera_de_rango).
+    """
+    tau_efectivo = max(float(tau), 1e-6)
+
+    exceso_superior = torch.nn.functional.softplus((pred - lim_sup) / tau_efectivo) * tau_efectivo
+    exceso_inferior = torch.nn.functional.softplus((lim_inf - pred) / tau_efectivo) * tau_efectivo
+    perdida = torch.mean(exceso_superior + exceso_inferior)
+
+    fuera = ((pred < lim_inf) | (pred > lim_sup)).float().mean()
+    return perdida, fuera
 
 
 def _guardar_estado_entrenamiento(
@@ -89,6 +158,12 @@ def entrenar(
     p_scale: float = 1.0,
     epocas_solo_datos: int = EPOCAS_SOLO_DATOS,
     epocas_rampa: int = EPOCAS_RAMPA,
+    lambda_rango_max: float = LAMBDA_RANGO_MAX,
+    epocas_rampa_rango: int = EPOCAS_RAMPA_RANGO,
+    tau_rango: float = TAU_RANGO,
+    usar_cuantiles_rango: bool = USAR_CUANTILES_RANGO,
+    cuantil_min: float = CUANTIL_MIN,
+    cuantil_max: float = CUANTIL_MAX,
     r_malla: float = R_MALLA,
     n_dias: int = N_DIAS,
 ) -> dict:
@@ -120,6 +195,12 @@ def entrenar(
     :param p_scale: factor de reescalado de presion para las ecuaciones N-S.
     :param epocas_solo_datos: epocas iniciales con lambda=0 (curriculum).
     :param epocas_rampa: epocas de rampa lineal de lambda (curriculum).
+    :param lambda_rango_max: peso maximo de la restriccion suave de rango.
+    :param epocas_rampa_rango: epocas de rampa lineal de lambda_rango.
+    :param tau_rango: temperatura de suavizado para penalizacion softplus.
+    :param usar_cuantiles_rango: si True usa cuantiles para limites robustos.
+    :param cuantil_min: cuantil inferior para definir limite robusto.
+    :param cuantil_max: cuantil superior para definir limite robusto.
     :param r_malla: resolucion de la malla para el calculo de batches.
     :param n_dias: horizonte temporal usado para escalar el batch size.
     :return: diccionario con el historial de entrenamiento.
@@ -130,6 +211,10 @@ def entrenar(
     logger.info(f"Curriculum: {epocas_solo_datos} solo datos, "
                 f"{epocas_rampa} rampa, "
                 f"{num_epocas - epocas_solo_datos - epocas_rampa} lambda completo")
+    logger.info(f"Range loss: lambda_max={lambda_rango_max}, "
+                f"rampa={epocas_rampa_rango}, tau={tau_rango}")
+    logger.info(f"Limites de rango por {'cuantiles' if usar_cuantiles_rango else 'min/max'}: "
+                f"qmin={cuantil_min:.3f}, qmax={cuantil_max:.3f}")
     logger.info(f"P_scale (reescalado presion): {p_scale:.4f}")
 
     # Mover modelo a GPU
@@ -163,11 +248,26 @@ def entrenar(
     logger.debug(f"Scheduler: factor={SCHEDULER_FACTOR}, patience={SCHEDULER_PATIENCE}")
     logger.debug(f"Max norm gradient: {max_norm}")
 
+    limites_rango = _calcular_limites_rango(
+        dataset_estaciones=dataset_estaciones,
+        usar_cuantiles=usar_cuantiles_rango,
+        cuantil_min=cuantil_min,
+        cuantil_max=cuantil_max,
+    )
+    logger.info(
+        "Limites rango u:[%.3f, %.3f] v:[%.3f, %.3f] p:[%.3f, %.3f]",
+        limites_rango["u"]["inf"].item(), limites_rango["u"]["sup"].item(),
+        limites_rango["v"]["inf"].item(), limites_rango["v"]["sup"].item(),
+        limites_rango["p"]["inf"].item(), limites_rango["p"]["sup"].item(),
+    )
+
     # Historial
     historial = {
         "epoch": [], "loss": [], "ns_loss": [],
         "p_loss": [], "u_loss": [], "v_loss": [], "lr": [],
         "lambda_efecto": [],
+        "range_loss": [], "range_u_loss": [], "range_v_loss": [], "range_p_loss": [],
+        "for_u": [], "for_v": [], "for_p": [], "lambda_rango_efecto": [],
     }
 
     RUTA_MODELOS.mkdir(parents=True, exist_ok=True)
@@ -201,7 +301,19 @@ def entrenar(
         acum_u = 0.0
         acum_v = 0.0
         acum_p = 0.0
+        acum_range = 0.0
+        acum_range_u = 0.0
+        acum_range_v = 0.0
+        acum_range_p = 0.0
+        acum_for_u = 0.0
+        acum_for_v = 0.0
+        acum_for_p = 0.0
         n_batches = 0
+
+        if epocas_rampa_rango > 0 and epoca < epocas_rampa_rango:
+            lambda_rango_efecto = lambda_rango_max * (epoca + 1) / epocas_rampa_rango
+        else:
+            lambda_rango_efecto = lambda_rango_max
 
         for batch_est, batch_col in zip(loader_estaciones, loader_colocacion):
             # Datos observados
@@ -232,10 +344,31 @@ def entrenar(
             loss_v = perdida_datos(v_pred, v_true)
             loss_p = perdida_datos(p_pred, p_true)
 
+            loss_rango_u, for_u = _penalizacion_rango_suave(
+                u_pred,
+                lim_inf=limites_rango["u"]["inf"].to(device),
+                lim_sup=limites_rango["u"]["sup"].to(device),
+                tau=tau_rango,
+            )
+            loss_rango_v, for_v = _penalizacion_rango_suave(
+                v_pred,
+                lim_inf=limites_rango["v"]["inf"].to(device),
+                lim_sup=limites_rango["v"]["sup"].to(device),
+                tau=tau_rango,
+            )
+            loss_rango_p, for_p = _penalizacion_rango_suave(
+                p_pred,
+                lim_inf=limites_rango["p"]["inf"].to(device),
+                lim_sup=limites_rango["p"]["sup"].to(device),
+                tau=tau_rango,
+            )
+            loss_rango = lambda_rango_efecto * (loss_rango_u + loss_rango_v + loss_rango_p)
+
             # 3. Perdida combinada (formula del proyecto base)
+            denominador = loss_fisica + loss_u + loss_v + loss_p + loss_rango + 1e-12
             loss_total = (
-                (loss_fisica ** 2 + loss_u ** 2 + loss_v ** 2 + loss_p ** 2)
-                / (loss_fisica + loss_u + loss_v + loss_p)
+                (loss_fisica ** 2 + loss_u ** 2 + loss_v ** 2 + loss_p ** 2 + loss_rango ** 2)
+                / denominador
             )
 
             loss_total.backward()
@@ -248,6 +381,13 @@ def entrenar(
             acum_u += loss_u.item()
             acum_v += loss_v.item()
             acum_p += loss_p.item()
+            acum_range += loss_rango.item()
+            acum_range_u += loss_rango_u.item()
+            acum_range_v += loss_rango_v.item()
+            acum_range_p += loss_rango_p.item()
+            acum_for_u += for_u.item()
+            acum_for_v += for_v.item()
+            acum_for_p += for_p.item()
             n_batches += 1
 
         # Promedios de la epoca
@@ -256,6 +396,13 @@ def entrenar(
         avg_u = acum_u / n_batches
         avg_v = acum_v / n_batches
         avg_p = acum_p / n_batches
+        avg_range = acum_range / n_batches
+        avg_range_u = acum_range_u / n_batches
+        avg_range_v = acum_range_v / n_batches
+        avg_range_p = acum_range_p / n_batches
+        avg_for_u = acum_for_u / n_batches
+        avg_for_v = acum_for_v / n_batches
+        avg_for_p = acum_for_p / n_batches
 
         if avg_ns < 1e-5 and lambda_efecto > 0:
             logger.warning(f"Loss NS muy bajo: {avg_ns:.3e}")
@@ -275,19 +422,30 @@ def entrenar(
         historial["u_loss"].append(avg_u)
         historial["v_loss"].append(avg_v)
         historial["p_loss"].append(avg_p)
+        historial["range_loss"].append(avg_range)
+        historial["range_u_loss"].append(avg_range_u)
+        historial["range_v_loss"].append(avg_range_v)
+        historial["range_p_loss"].append(avg_range_p)
+        historial["for_u"].append(avg_for_u)
+        historial["for_v"].append(avg_for_v)
+        historial["for_p"].append(avg_for_p)
         historial["lr"].append(lr_actual)
         historial["lambda_efecto"].append(lambda_efecto)
+        historial["lambda_rango_efecto"].append(lambda_rango_efecto)
 
         # Logging
         if epoca % 10 == 0:
             logger.info(
                 f"| Epoca: {epoca:4} | Loss: {avg_loss:.3e} | LR: {lr_actual:.1e} "
-                f"| Lambda: {lambda_efecto:.2f} |"
+                f"| LambdaNS: {lambda_efecto:.2f} | LambdaR: {lambda_rango_efecto:.2f} "
+                f"| FOR(u,v,p): {avg_for_u:.2%}, {avg_for_v:.2%}, {avg_for_p:.2%} |"
             )
         logger.debug(
             f"|Epoca: {epoca:4}|Loss: {avg_loss:.3e}|NS: {avg_ns:.3e}"
             f"|U: {avg_u:.3e}|V: {avg_v:.3e}|P: {avg_p:.3e}"
-            f"|LR: {lr_actual:.1e}|Lambda: {lambda_efecto:.2f}|"
+            f"|R: {avg_range:.3e}|FOR_u: {avg_for_u:.2%}|FOR_v: {avg_for_v:.2%}"
+            f"|FOR_p: {avg_for_p:.2%}|LR: {lr_actual:.1e}|"
+            f"LambdaNS: {lambda_efecto:.2f}|LambdaR: {lambda_rango_efecto:.2f}|"
         )
 
         # Checkpoint periodico

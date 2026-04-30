@@ -11,7 +11,9 @@ import torch
 from config.logging_config import configurar_logging
 from config.settings import (
     ARCHIVO_PARQUET, ESTACIONES_EXCLUIDAS, HIDDEN_NEURONS, INTERVALO,
+    CUANTIL_MAX, CUANTIL_MIN,
     N_DIAS, R_MALLA, RUTA_MODELOS, RUTA_REPORTES,
+    USAR_CUANTILES_RANGO,
 )
 from src.data.cargar_datos import cargar_parquet
 from src.data.preprocesar_datos import preprocesar
@@ -59,6 +61,15 @@ def _guardar_metricas_evaluacion(
         "mse_v": float(metricas["mse_v"]),
         "mse_p": float(metricas["mse_p"]),
         "residual_ns": float(metricas["residual_ns"]),
+        "for_u": float(metricas["for_u"]),
+        "for_v": float(metricas["for_v"]),
+        "for_p": float(metricas["for_p"]),
+        "lim_u_inf": float(metricas["lim_u_inf"]),
+        "lim_u_sup": float(metricas["lim_u_sup"]),
+        "lim_v_inf": float(metricas["lim_v_inf"]),
+        "lim_v_sup": float(metricas["lim_v_sup"]),
+        "lim_p_inf": float(metricas["lim_p_inf"]),
+        "lim_p_sup": float(metricas["lim_p_sup"]),
         "ruta_checkpoint": str(ruta_checkpoint),
         "ruta_reporte": str(ruta_reporte),
     }
@@ -111,6 +122,9 @@ def _resolver_contexto_evaluacion(
             "nombre_modelo": prefijo,
             "nombre_experimento": None,
             "epoca": epoca_efectiva,
+            "usar_cuantiles_rango": USAR_CUANTILES_RANGO,
+            "cuantil_min": CUANTIL_MIN,
+            "cuantil_max": CUANTIL_MAX,
         }
 
     epoca_efectiva = manifiesto.get("num_epocas") if epoca is None else epoca
@@ -127,6 +141,11 @@ def _resolver_contexto_evaluacion(
         "nombre_modelo": str(manifiesto["nombre_modelo"]),
         "nombre_experimento": str(manifiesto.get("nombre_experimento", "")),
         "epoca": int(epoca_efectiva),
+        "usar_cuantiles_rango": bool(
+            manifiesto.get("usar_cuantiles_rango", USAR_CUANTILES_RANGO)
+        ),
+        "cuantil_min": float(manifiesto.get("cuantil_min", CUANTIL_MIN)),
+        "cuantil_max": float(manifiesto.get("cuantil_max", CUANTIL_MAX)),
     }
 
 
@@ -208,7 +227,10 @@ def main(
     logger.info("EVALUACION DE METRICAS")
     logger.info("=" * 60)
     metricas = evaluar_metricas(modelo, dataset_estaciones, device,
-                                p_scale=p_scale)
+                                p_scale=p_scale,
+                                usar_cuantiles_rango=contexto["usar_cuantiles_rango"],
+                                cuantil_min=contexto["cuantil_min"],
+                                cuantil_max=contexto["cuantil_max"])
 
     logger.info("-" * 40)
     logger.info(f"MSE u_x:         {metricas['mse_u']:.6f}")
@@ -217,6 +239,9 @@ def main(
     if reescalar:
         logger.info(f"MSE presion (escala original): {metricas['mse_p'] * p_scale**2:.6f}")
     logger.info(f"Residual NS:     {metricas['residual_ns']:.6f}")
+    logger.info(f"FOR u_x:         {metricas['for_u']:.2%}")
+    logger.info(f"FOR u_y:         {metricas['for_v']:.2%}")
+    logger.info(f"FOR presion:     {metricas['for_p']:.2%}")
     logger.info("-" * 40)
 
     ruta_metricas = RUTA_MODELOS / (
